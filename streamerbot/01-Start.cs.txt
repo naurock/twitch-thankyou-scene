@@ -1,0 +1,104 @@
+using System;
+using System.IO;
+using System.Text;
+using System.Collections.Generic;
+using System.Threading;
+using Newtonsoft.Json;
+
+public class CPHInline
+{
+    // Diese Datei wird als Vorlage verwendet. In den vier fertigen Dateien ist Mode bereits gesetzt.
+    private const string Mode = "start";
+    // Standard: Windows-Dokumente\Stream-Danke (auch bei umgeleitetem OneDrive-Dokumente-Ordner).
+    // Alternativ hier in ALLEN vier Aktionen einen festen Ordner eintragen, z.B. @"D:\Overlays\Stream-Danke".
+    private string Folder { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Stream-Danke"); } }
+
+    public bool Execute()
+    {
+        try
+        {
+            // Derselbe Mutex serialisiert die vier getrennten C#-Aktionen.
+            using (var mutex = new Mutex(false, "Local\\StreamDankeCreditsV1"))
+            {
+                bool owned = false;
+                try
+                {
+                    try { owned = mutex.WaitOne(10000); } catch (AbandonedMutexException) { owned = true; }
+                    if (!owned) throw new Exception("Datenspeicher ist belegt. Aktion erneut testen.");
+                    return Update();
+                }
+                finally { if (owned) mutex.ReleaseMutex(); }
+            }
+        }
+        catch (Exception ex) { CPH.LogError("[Stream-Danke] " + ex.Message); return false; }
+    }
+
+    private bool Update()
+    {
+        string folder = Folder;
+        if (!File.Exists(Path.Combine(folder, "overlay.html")))
+            throw new Exception("overlay.html fehlt in " + folder + ". ZIP nach Dokumente\\Stream-Danke entpacken oder Folder im Code anpassen.");
+        string statePath = Path.Combine(folder, "session.json");
+        State state;
+        if (Mode == "start")
+            state = new State { active = true, session = Guid.NewGuid().ToString("N"), startedAt = DateTime.UtcNow.ToString("o") };
+        else if (File.Exists(statePath))
+            state = JsonConvert.DeserializeObject<State>(File.ReadAllText(statePath, Encoding.UTF8));
+        else state = new State();
+        if (state == null || state.followers == null || state.raids == null || state.version != 1)
+            throw new Exception("session.json ist ungueltig. Datei sichern und Start-Aktion fuer eine neue Sitzung ausfuehren.");
+        if (Mode == "stop") state.active = false;
+        else if (Mode == "follow" || Mode == "raid")
+        {
+            if (!state.active) { CPH.LogInfo("[Stream-Danke] Ereignis ignoriert: keine aktive Sitzung. Zuerst Start-Aktion ausfuehren."); return true; }
+            string name = Arg("user");
+            if (String.IsNullOrWhiteSpace(name)) name = Arg("userName");
+            if (String.IsNullOrWhiteSpace(name)) throw new Exception("Twitch-Name fehlt. Richtigen Follow-/eingehenden Raid-Trigger verwenden.");
+            string id = Arg("userId");
+            string login = Arg("userName");
+            string key = !String.IsNullOrWhiteSpace(id) ? id : (!String.IsNullOrWhiteSpace(login) ? login : name).ToLowerInvariant();
+            if (Mode == "follow")
+            {
+                bool exists = state.followers.Exists(x => x.id == key || String.Equals(x.name, name, StringComparison.OrdinalIgnoreCase));
+                if (!exists) state.followers.Add(new Person { id = key, name = name });
+            }
+            else
+            {
+                int viewers;
+                int? count = Int32.TryParse(Arg("viewers"), out viewers) && viewers >= 0 ? (int?)viewers : null;
+                state.raids.Add(new Raid { id = key, name = name, viewers = count, at = DateTime.UtcNow.ToString("o") });
+            }
+        }
+        else if (Mode != "start") throw new Exception("Unbekannter Modus: " + Mode);
+        var settings = new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeHtml };
+        string json = JsonConvert.SerializeObject(state, settings);
+        AtomicWrite(statePath, json);
+        AtomicWrite(Path.Combine(folder, "data.js"), "window.STREAM_CREDITS = " + json + ";\n");
+        CPH.LogInfo("[Stream-Danke] " + Mode + ": " + state.followers.Count + " Follower, " + state.raids.Count + " Raids. " + (state.active ? "Sammlung aktiv." : "Sammlung beendet."));
+        return true;
+    }
+
+    private string Arg(string key)
+    {
+        object value;
+        return args.TryGetValue(key, out value) && value != null ? Convert.ToString(value) : "";
+    }
+    private void AtomicWrite(string target, string content)
+    {
+        string temp = target + ".tmp";
+        File.WriteAllText(temp, content, new UTF8Encoding(false));
+        if (File.Exists(target)) File.Replace(temp, target, null, true);
+        else File.Move(temp, target);
+    }
+    public class Person { public string id = ""; public string name = ""; }
+    public class Raid : Person { public int? viewers; public string at = ""; }
+    public class State
+    {
+        public int version = 1;
+        public string session = "";
+        public string startedAt = "";
+        public bool active = false;
+        public List<Person> followers = new List<Person>();
+        public List<Raid> raids = new List<Raid>();
+    }
+}

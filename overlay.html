@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Danke fürs Dabeisein · Stream-Abspann</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="stage">
+    <header><span class="brand" id="channel"></span></header>
+    <section class="intro">
+      <img class="channel-logo" src="logo.png" alt="Kanallogo" width="250">
+      <h1>Danke<span>!</span></h1>
+      <p class="subtitle" id="subtitle">Bis zum nächsten Stream.</p>
+    </section>
+    <section class="credits" aria-label="Danke an die Community">
+      <div class="credit-body" id="credit-body">
+        <div class="section-label" id="section-label"></div>
+        <h2 id="credit-title">Schön, dass ihr da wart.</h2>
+        <p class="section-note" id="section-note"></p>
+        <div id="names" class="names"></div>
+      </div>
+      <div class="credits-bottom"><span id="page-label">BIS BALD</span><div class="dots" id="dots"></div><span id="page-number">01</span></div>
+      <div class="progress"><div id="progress-bar"></div></div>
+    </section>
+    <footer><span id="footer-text"></span></footer>
+    <div id="demo-badge" hidden>VORSCHAU · BEISPIELNAMEN</div>
+  </main>
+  <script src="config.js"></script>
+  <script src="overlay.js"></script>
+</body>
+</html>

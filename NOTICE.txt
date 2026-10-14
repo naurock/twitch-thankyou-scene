@@ -1,0 +1,29 @@
+STREAM-DANKE — LICENSE SCOPE / LIZENZUMFANG
+
+Original project code and documentation: MIT (SPDX: MIT), see LICENSE.
+Eigener Projektcode und Dokumentation: MIT (SPDX: MIT), siehe LICENSE.
+Attribution / Zuschreibung: Stream-Danke contributors, 2026.
+
+EXCLUDED / AUSGENOMMEN: logo.png
+The personal channel logo is not covered by the MIT license. Its presence in
+this original package does not grant permission for separate redistribution,
+modification or use as another channel's branding. Replace it for other channels.
+Remove it before public redistribution unless separately authorized by its owner.
+Das persoenliche Kanallogo ist nicht von der MIT-Lizenz umfasst. Fuer andere
+Kanaele durch ein eigenes/lizenziertes Logo ersetzen. Vor oeffentlicher Weitergabe
+entfernen, sofern keine gesonderte Freigabe des Rechteinhabers vorliegt.
+
+Third-party software and assets retain their own licenses.
+Drittsoftware und Drittassets behalten ihre eigenen Lizenzen.
+OBS Studio, streamer.bot, Twitch and Elgato Stream Deck are not bundled and are
+not claimed to endorse or officially support this independent project.
+Keine behauptete offizielle Verbindung oder Unterstuetzung durch diese Anbieter.
+
+Before redistribution remove personal session.json data, restore data.js to its
+empty distribution state, and remove credentials and personal paths.
+Vor Weitergabe persoenliche Sitzungsdaten, Zugangsdaten und Pfade entfernen.
+
+Documentation updated: 2026-10-14. Runtime files unchanged from supplied package.
+Dokumentation aktualisiert: 14.10.2026. Programmdateien unveraendert.
+Historical development checks are recorded in PRUEFUNG.txt; this update is not a
+new live test in OBS/streamer.bot or with Twitch events.

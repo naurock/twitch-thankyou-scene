@@ -1,0 +1,48 @@
+STREAM-DANKE / VERSION 1.1 / 01.10.2026
+
+Designupdate 1.1: Original-Kanallogo integriert, Orange/Anthrazit/warmes Weiss,
+minimale Texte, ausschliesslich serifenlose Schrift ohne Kursivsatz.
+JavaScript-Syntax nach dem Designupdate erneut erfolgreich geprueft.
+Die untenstehenden Funktionstests beziehen sich auf Version 1; die
+Datensammlung und der Ablauf der Seitenwechsel wurden nicht veraendert.
+
+Erfolgreich ausgefuehrte Pruefungen
+
+C#-Datensammlung: 14 Pruefungen in einer separaten .NET-9-Testumgebung mit
+Newtonsoft.Json. Die Streamer.bot-Argumente und Log-Methoden wurden simuliert;
+Dateien, Serialisierung, Sperre und atomarer Dateiaustausch wurden real verwendet.
+
+- Start erzeugt eine neue Sitzung.
+- Wiederholter Follow desselben Nutzers wird dedupliziert.
+- Unicode und Sonderzeichen bleiben erhalten.
+- HTML-relevante Zeichen werden beim Export maskiert.
+- Zwei eingehende Raids bleiben zwei Eintraege.
+- Die Raid-Zuschauerzahl wird erhalten.
+- Eine neue Codeinstanz laedt den Stand von der Festplatte; Login-Fallback greift.
+- Stop beendet die Sammlung.
+- Offline-Follows werden ignoriert; alte Namen bleiben sichtbar.
+- Ein neuer Streamstart leert die vorherige Sitzung.
+- Eine fehlende Raid-Zuschauerzahl bleibt unbekannt statt erfunden zu werden.
+- Fehlender Twitch-Name wird als Fehler abgewiesen.
+- Beschaedigte Sitzungsdaten ueberschreiben den letzten Overlaystand nicht.
+- Ein ausdruecklicher Neustart stellt eine gueltige Sitzung her.
+
+JavaScript: Syntaxpruefung mit Node.js und Ausfuehrung der unveraenderten
+Overlaylogik in einem simulierten DOM mit kontrollierter Uhr.
+- Neun Follower erscheinen auf zwei Seiten (8 + 1), danach Raids und Dank.
+- Namen werden als Text eingesetzt; Raid-Zuschauerzahl wird formatiert.
+- Sitzungswechsel entfernt alte Namen; leere und ungueltige Daten sind behandelt.
+
+Grenzen dieser Pruefung
+
+Ein Chromium-/Edge-Start zur visuellen Kontrolle war in der eingeschraenkten
+Windows-Arbeitsumgebung nicht moeglich (Zugriff auf benoetigte Browser-IPC blockiert).
+Die Darstellung, lokale Script-Nachladung im OBS-Browser und Schriftanpassung
+konnten deshalb nicht mit einer laufenden Browser-Engine verifiziert werden.
+
+Die C#-Aktionen wurden nicht im echten Streamer.bot-Host kompiliert/ausgefuehrt.
+Ein echter Twitch-Follow, ein echter eingehender Raid und die Stream-Deck-Taste
+wurden nicht an deinem installierten Setup getestet. Die Anleitung enthaelt
+einen kurzen Einrichtungstest vor dem ersten Live-Einsatz.
+
+Offizielle Schnittstellenreferenzen sind in ANLEITUNG-DE.md und GUIDE-EN.md verlinkt.
